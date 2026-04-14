@@ -1,8 +1,9 @@
 import pandas as pd
-def get_dataframe():
+import sqlite3
+
+def get_seed_dataframe():
     listings = [
         {
-            "id": 1,
             "标题": "阿德莱德CBD 近大学女生双人间床位",
             "区域": "Adelaide CBD",
             "价格": 230,
@@ -18,7 +19,6 @@ def get_dataframe():
             "是否带家具": "是"
         },
         {
-            "id": 2,
             "标题": "North Adelaide 独立Studio",
             "区域": "North Adelaide",
             "价格": 315,
@@ -34,7 +34,6 @@ def get_dataframe():
             "是否带家具": "是"
         },
         {
-            "id": 3,
             "标题": "Norwood 单间招租",
             "区域": "Norwood",
             "价格": 250,
@@ -50,7 +49,6 @@ def get_dataframe():
             "是否带家具": "否"
         },
         {
-            "id": 4,
             "标题": "Prospect 两室一厅整租",
             "区域": "Prospect",
             "价格": 320,
@@ -66,7 +64,6 @@ def get_dataframe():
             "是否带家具": "是"
         },
         {
-            "id": 5,
             "标题": "Mawson Lakes 便宜合租房",
             "区域": "Mawson Lakes",
             "价格": 185,
@@ -82,7 +79,6 @@ def get_dataframe():
             "是否带家具": "是"
         },
         {
-            "id": 6,
             "标题": "burnside 便宜合租房",
             "区域": "burnside",
             "价格": 170,
@@ -90,18 +86,20 @@ def get_dataframe():
             "纬度": -34.9497,
             "经度": 138.6530,
             "描述": "价格低，适合预算敏感型学生。",
-            "图片": [
-        "images/IMG_3266.JPG",
-        "images/IMG_3267.JPG",
-        "images/IMG_3268.JPG"
-    ],
+            "图片": "images/IMG_3266.JPG",
             "联系人": "houbingtao",
             "电话": "0400 111 222",
             "微信": "houbingtao1974",
             "是否包bill": "否",
-            "是否带家具": "是"}
-
+            "是否带家具": "是"
+        }
     ]
 
-    df = pd.DataFrame(listings)
+    return pd.DataFrame(listings)
+
+
+def get_dataframe():
+    conn = sqlite3.connect("rent.db")
+    df = pd.read_sql("SELECT * FROM listings", conn)
+    conn.close()
     return df
