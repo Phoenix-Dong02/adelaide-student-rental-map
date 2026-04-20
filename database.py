@@ -1,10 +1,12 @@
 import sqlite3
 
 def get_connection():
+    # Create a connection to the SQLite database
     return sqlite3.connect("rent.db")
 
 
 def create_table():
+    # Create the listings table if it does not exist
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -30,7 +32,9 @@ def create_table():
     conn.commit()
     conn.close()
 
+
 def insert_listing(listing):
+    # Insert a new rental listing into the database
     conn = get_connection()
     cursor = conn.cursor()
 
