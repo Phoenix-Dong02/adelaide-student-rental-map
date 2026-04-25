@@ -19,6 +19,12 @@ if "selected_lng" not in st.session_state:
     st.session_state.selected_lng = 138.6007
 
 st.title("发布房源")
+
+password = st.text_input("管理员密码", type="password")
+
+if password != st.secrets.get("ADMIN_PASSWORD"):
+    st.warning("请输入管理员密码后发布房源。")
+    st.stop()
 st.page_link("租房地图.py", label="← 返回地图")
 
 # Input fields

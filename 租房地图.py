@@ -36,7 +36,7 @@ st.title("阿德莱德学生租房地图")
 st.caption("以地图为核心，更直观地按位置和价格找房")
 
 # Navigation to post page
-st.page_link("pages/发布房源.py", label="发布房源", icon="➕")
+st.page_link("pages/发布房源.py", label="管理员发布", icon="➕")
 
 # Load data from database
 df = data.get_dataframe()
