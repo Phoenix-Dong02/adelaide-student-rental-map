@@ -88,7 +88,8 @@ if st.button("提交房源"):
                 "电话": phone,
                 "微信": wechat,
                 "是否包bill": bill,
-                "是否带家具": furniture
+                "是否带家具": furniture,
+                "status": "active" 
             })
 
             st.success("房源发布成功！")

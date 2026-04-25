@@ -12,6 +12,6 @@ def get_seed_dataframe():
 def get_dataframe():
     # Load all listings from SQLite database
     conn = sqlite3.connect("rent.db")
-    df = pd.read_sql("SELECT * FROM listings", conn)
+    df = pd.read_sql("SELECT * FROM listings WHERE status='active'", conn)
     conn.close()
     return df

@@ -57,10 +57,15 @@ def render_map(filtered_df):
         </div>
         """
 
+        status = row.get("status", "active")
+
+        color = "red" if status == "active" else "gray"
+
         folium.Marker(
             location=[row["纬度"], row["经度"]],
             popup=folium.Popup(popup_html, max_width=300),
-            tooltip=f"{row['标题']} - ${row['价格']}/周"
+            tooltip=f"{row['标题']} - ${row['价格']}/周",
+            icon=folium.Icon(color=color)
         ).add_to(m)
 
     st_folium(m, height=900, use_container_width=True)

@@ -25,7 +25,8 @@ def create_table():
         电话 TEXT,
         微信 TEXT,
         是否包bill TEXT,
-        是否带家具 TEXT
+        是否带家具 TEXT，
+        status TEXT DEFAULT 'active'
     )
     """)
 
@@ -42,8 +43,8 @@ def insert_listing(listing):
     INSERT INTO listings (
         标题, 区域, 价格, 房型, 纬度, 经度,
         描述, 图片, 联系人, 电话, 微信,
-        是否包bill, 是否带家具
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        是否包bill, 是否带家具, status
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         listing["标题"],
         listing["区域"],
@@ -57,7 +58,8 @@ def insert_listing(listing):
         listing["电话"],
         listing["微信"],
         listing["是否包bill"],
-        listing["是否带家具"]
+        listing["是否带家具"],
+        listing.get("status", "active")
     ))
 
     conn.commit()
