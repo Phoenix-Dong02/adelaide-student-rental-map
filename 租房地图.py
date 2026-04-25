@@ -10,10 +10,12 @@ import database
 
 database.create_tracking_tables()
 
-conn = database.get_connection()
-conn.execute("INSERT INTO page_visits DEFAULT VALUES")
-conn.commit()
-conn.close()
+if "visit_recorded" not in st.session_state:
+    conn = database.get_connection()
+    conn.execute("INSERT INTO page_visits DEFAULT VALUES")
+    conn.commit()
+    conn.close()
+    st.session_state.visit_recorded = True
 
 # Configure page settings
 st.set_page_config(page_title="阿德莱德学生租房地图", layout="wide")
