@@ -4,6 +4,7 @@ from streamlit_folium import st_folium
 import base64
 import os
 
+
 def image_to_html_src(image_path: str) -> str:
     # Convert image path (local or URL) into HTML display format
 
@@ -27,30 +28,39 @@ def image_to_html_src(image_path: str) -> str:
 def render_map(filtered_df):
     # Render interactive map with listing markers
 
-    st.subheader("Map View")
-
     m = folium.Map(location=[-34.9285, 138.6007], zoom_start=12)
 
     for _, row in filtered_df.iterrows():
-        img_src = image_to_html_src(row["图片"])
+        image_value = str(row["图片"]) if row["图片"] else ""
+        first_image = image_value.split(",")[0].strip() if image_value else ""
+        img_src = image_to_html_src(first_image)
+
+        image_html = (
+            f"<img src='{img_src}' width='100%' style='border-radius:8px'/>"
+            if img_src else
+            "<p><i>暂无图片</i></p>"
+        )
 
         popup_html = f"""
         <div style='width:260px'>
             <h4>{row['标题']}</h4>
-            <p><b>Suburb:</b> {row['区域']}</p>
-            <p><b>Price:</b> ${row['价格']}/week</p>
-            <p><b>Room Type:</b> {row['房型']}</p>
-            <p><b>Contact:</b> {row['联系人']}</p>
-            <p><b>Phone:</b> {row['电话']}</p>
-            <p><b>WeChat:</b> {row['微信']}</p>
-            <img src='{img_src}' width='240'/>
+            <p><b>区域：</b> {row['区域']}</p>
+            <p><b>价格：</b> ${row['价格']}/周</p>
+            <p><b>房型：</b> {row['房型']}</p>
+            <p><b>联系人：</b> {row['联系人']}</p>
+            <p><b>电话：</b> {row['电话']}</p>
+            <p><b>微信：</b> {row['微信']}</p>
+            <p style='color:gray;font-size:12px'>
+            位置为大致范围，具体地址请联系房东。
+            </p>
+            {image_html}
         </div>
         """
 
         folium.Marker(
-            location=[row['纬度'], row['经度']],
+            location=[row["纬度"], row["经度"]],
             popup=folium.Popup(popup_html, max_width=300),
-            tooltip=f"{row['标题']} - ${row['价格']}/week"
+            tooltip=f"{row['标题']} - ${row['价格']}/周"
         ).add_to(m)
 
-    st_folium(m, height=700)
+    st_folium(m, height=900, use_container_width=True)

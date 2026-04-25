@@ -1,21 +1,40 @@
 import streamlit as st
+import database
 
 def render_list(filtered_df):
     # Render rental listings as cards
 
-    st.subheader(f"Listings ({len(filtered_df)})")
+    st.subheader(f"房源列表（{len(filtered_df)}）")
 
     if filtered_df.empty:
-        st.warning("No listings match the selected filters")
+        st.warning("没有符合当前筛选条件的房源")
         return
 
     for _, row in filtered_df.iterrows():
         with st.container(border=True):
+
+            image_value = str(row["图片"]) if row["图片"] else ""
+            image_url = image_value.split(",")[0].strip() if image_value else ""
+
+            if image_url:
+                st.image(image_url, use_container_width=True)
+
             st.markdown(f"### {row['标题']}")
-            st.markdown(f"**Suburb:** {row['区域']}")
-            st.markdown(f"**Price:** ${row['价格']}/week")
-            st.markdown(f"**Room Type:** {row['房型']}")
-            st.markdown(f"**Bills Included:** {row['是否包bill']} | **Furnished:** {row['是否带家具']}")
-            st.markdown(f"**Description:** {row['描述']}")
-            st.markdown(f"**Phone:** {row['电话']}")
-            st.markdown(f"**WeChat:** {row['微信']}")
+            st.markdown(f"**区域：** {row['区域']}")
+            st.markdown(f"**价格：** ${row['价格']}/周")
+            st.markdown(f"**房型：** {row['房型']}")
+            st.markdown(f"**是否包 bill：** {row['是否包bill']} ｜ **是否带家具：** {row['是否带家具']}")
+            st.markdown(f"**描述：** {row['描述']}")
+            st.markdown(f"**电话：** {row['电话']}")
+            st.markdown(f"**微信：** {row['微信']}")
+            st.caption("位置为大致范围，具体地址请联系房东。")
+
+            if st.button("我感兴趣", key=row["id"]):
+                conn = database.get_connection()
+                conn.execute(
+                    "INSERT INTO listing_clicks (listing_id) VALUES (?)",
+                    (row["id"],)
+                )
+                conn.commit()
+                conn.close()
+                st.success("已记录你的兴趣")

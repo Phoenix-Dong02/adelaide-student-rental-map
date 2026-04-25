@@ -62,3 +62,33 @@ def insert_listing(listing):
 
     conn.commit()
     conn.close()
+
+def create_tracking_tables():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS page_visits (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        visited_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS listing_clicks (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        listing_id INTEGER,
+        clicked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS feedback (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        content TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+
+    conn.commit()
+    conn.close()
