@@ -25,10 +25,23 @@ def create_table():
         电话 TEXT,
         微信 TEXT,
         是否包bill TEXT,
-        是否带家具 TEXT，
+        是否带家具 TEXT,
         status TEXT DEFAULT 'active'
     )
     """)
+
+    conn.commit()
+    conn.close()
+
+def migrate_database():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("PRAGMA table_info(listings)")
+    columns = [col[1] for col in cursor.fetchall()]
+
+    if "status" not in columns:
+        cursor.execute("ALTER TABLE listings ADD COLUMN status TEXT DEFAULT 'active'")
 
     conn.commit()
     conn.close()
@@ -94,3 +107,5 @@ def create_tracking_tables():
 
     conn.commit()
     conn.close()
+
+    

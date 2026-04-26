@@ -7,7 +7,10 @@ import map_view
 import ui
 import database
 
+st.set_page_config(page_title="阿德莱德学生租房地图", layout="wide")
 
+database.create_table()
+database.migrate_database()
 database.create_tracking_tables()
 
 if "visit_recorded" not in st.session_state:
@@ -17,11 +20,6 @@ if "visit_recorded" not in st.session_state:
     conn.close()
     st.session_state.visit_recorded = True
 
-# Configure page settings
-st.set_page_config(page_title="阿德莱德学生租房地图", layout="wide")
-
-# Ensure database and table exist
-database.create_table()
 
 # Initialize database with seed data if empty
 conn = database.get_connection()
