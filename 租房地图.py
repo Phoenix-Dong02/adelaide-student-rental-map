@@ -1,5 +1,4 @@
 import streamlit as st
-import pandas as pd
 
 import data
 import filters
@@ -14,37 +13,18 @@ database.migrate_database()
 database.create_tracking_tables()
 
 if "visit_recorded" not in st.session_state:
-    conn = database.get_connection()
-    conn.execute("INSERT INTO page_visits DEFAULT VALUES")
-    conn.commit()
-    conn.close()
+    database.record_page_visit()
     st.session_state.visit_recorded = True
 
-
-# Initialize database with seed data if empty
-conn = database.get_connection()
-count = pd.read_sql("SELECT COUNT(*) as count FROM listings", conn).iloc[0]["count"]
-
-if count == 0:
-    seed_df = data.get_seed_dataframe()
-    seed_df.to_sql("listings", conn, if_exists="append", index=False)
-
-conn.close()
-
-# Page header
 st.title("阿德莱德学生租房地图")
 st.caption("以地图为核心，更直观地按位置和价格找房")
 
-# Navigation to post page
 st.page_link("pages/发布房源.py", label="管理员发布", icon="➕")
 
-# Load data from database
 df = data.get_dataframe()
 
-# Apply sidebar filters
 filtered_df = filters.apply_filters(df)
 
-# Layout: left = list, right = map
 col1, col2 = st.columns([0.8, 4.2])
 
 with col1:
@@ -60,11 +40,5 @@ feedback = st.text_area("你有什么建议？")
 
 if st.button("提交反馈"):
     if feedback.strip():
-        conn = database.get_connection()
-        conn.execute(
-            "INSERT INTO feedback (content) VALUES (?)",
-            (feedback,)
-        )
-        conn.commit()
-        conn.close()
+        database.insert_feedback(feedback.strip())
         st.success("感谢你的反馈！")

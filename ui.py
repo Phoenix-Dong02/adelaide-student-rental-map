@@ -30,11 +30,5 @@ def render_list(filtered_df):
             st.caption("位置为大致范围，具体地址请联系房东。")
 
             if st.button("我感兴趣", key=row["id"]):
-                conn = database.get_connection()
-                conn.execute(
-                    "INSERT INTO listing_clicks (listing_id) VALUES (?)",
-                    (row["id"],)
-                )
-                conn.commit()
-                conn.close()
+                database.record_listing_click(row["id"])
                 st.success("已记录你的兴趣")

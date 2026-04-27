@@ -1,111 +1,104 @@
-import sqlite3
-
-def get_connection():
-    # Create a connection to the SQLite database
-    return sqlite3.connect("rent.db")
+import streamlit as st
+import pandas as pd
+from supabase import create_client
 
 
+@st.cache_resource
+def get_supabase_client():
+    url = st.secrets["SUPABASE_URL"]
+    key = st.secrets["SUPABASE_KEY"]
+    return create_client(url, key)
+
+
+# Keep these functions so old code will not break.
+# Tables are now created in Supabase SQL Editor, not inside Python.
 def create_table():
-    # Create the listings table if it does not exist
-    conn = get_connection()
-    cursor = conn.cursor()
+    pass
 
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS listings (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        标题 TEXT,
-        区域 TEXT,
-        价格 INTEGER,
-        房型 TEXT,
-        纬度 REAL,
-        经度 REAL,
-        描述 TEXT,
-        图片 TEXT,
-        联系人 TEXT,
-        电话 TEXT,
-        微信 TEXT,
-        是否包bill TEXT,
-        是否带家具 TEXT,
-        status TEXT DEFAULT 'active'
-    )
-    """)
-
-    conn.commit()
-    conn.close()
 
 def migrate_database():
-    conn = get_connection()
-    cursor = conn.cursor()
+    pass
 
-    cursor.execute("PRAGMA table_info(listings)")
-    columns = [col[1] for col in cursor.fetchall()]
 
-    if "status" not in columns:
-        cursor.execute("ALTER TABLE listings ADD COLUMN status TEXT DEFAULT 'active'")
-
-    conn.commit()
-    conn.close()
+def create_tracking_tables():
+    pass
 
 
 def insert_listing(listing):
-    # Insert a new rental listing into the database
-    conn = get_connection()
-    cursor = conn.cursor()
+    supabase = get_supabase_client()
+    return supabase.table("listings").insert(listing).execute()
 
-    cursor.execute("""
-    INSERT INTO listings (
-        标题, 区域, 价格, 房型, 纬度, 经度,
-        描述, 图片, 联系人, 电话, 微信,
-        是否包bill, 是否带家具, status
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """, (
-        listing["标题"],
-        listing["区域"],
-        listing["价格"],
-        listing["房型"],
-        listing["纬度"],
-        listing["经度"],
-        listing["描述"],
-        listing["图片"],
-        listing["联系人"],
-        listing["电话"],
-        listing["微信"],
-        listing["是否包bill"],
-        listing["是否带家具"],
-        listing.get("status", "active")
-    ))
 
-    conn.commit()
-    conn.close()
-
-def create_tracking_tables():
-    conn = get_connection()
-    cursor = conn.cursor()
-
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS page_visits (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        visited_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+def get_active_listings():
+    supabase = get_supabase_client()
+    response = (
+        supabase
+        .table("listings")
+        .select("*")
+        .eq("status", "active")
+        .order("id", desc=True)
+        .execute()
     )
-    """)
+    return pd.DataFrame(response.data)
 
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS listing_clicks (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        listing_id INTEGER,
-        clicked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+def get_all_listings():
+    supabase = get_supabase_client()
+    response = (
+        supabase
+        .table("listings")
+        .select("*")
+        .order("id", desc=True)
+        .execute()
     )
-    """)
+    return pd.DataFrame(response.data)
 
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS feedback (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        content TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+def count_listings():
+    supabase = get_supabase_client()
+    response = supabase.table("listings").select("id").execute()
+    return len(response.data)
+
+
+def record_page_visit():
+    supabase = get_supabase_client()
+    return supabase.table("page_visits").insert({}).execute()
+
+
+def record_listing_click(listing_id):
+    supabase = get_supabase_client()
+    return supabase.table("listing_clicks").insert({
+        "listing_id": int(listing_id)
+    }).execute()
+
+
+def insert_feedback(content):
+    supabase = get_supabase_client()
+    return supabase.table("feedback").insert({
+        "content": content
+    }).execute()
+
+
+def get_table_dataframe(table_name):
+    supabase = get_supabase_client()
+    response = (
+        supabase
+        .table(table_name)
+        .select("*")
+        .order("id", desc=True)
+        .execute()
     )
-    """)
+    return pd.DataFrame(response.data)
 
-    conn.commit()
-    conn.close()
+
+def update_listing_status(listing_id, status):
+    supabase = get_supabase_client()
+    return (
+        supabase
+        .table("listings")
+        .update({"status": status})
+        .eq("id", int(listing_id))
+        .execute()
+    )
 
     
