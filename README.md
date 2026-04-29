@@ -47,20 +47,24 @@ This project introduces a **map-first rental platform** that:
 
 ## ✨ Features
 
-- Interactive rental map using Folium
+- Map-first rental exploration (primary interface)
+- Interactive property markers on map
+- Click marker to preview listing and view details
+- Dynamic detail panel showing selected listing
 - Filters for price, room type, suburb, furniture, and bills
-- Listing cards with detailed property information
-- Image browsing for each property
-- Summary table for filtered results
+- Cloud-based image hosting (Cloudinary)
+- Backend powered by Supabase
 
 ---
 
 ## 🛠 Tech Stack
 
 - Python
-- Streamlit
-- Pandas
-- Folium
+- Streamlit (Frontend + App Logic)
+- Folium + streamlit-folium (Map Visualization)
+- Supabase (Database & Backend)
+- Cloudinary (Image Hosting)
+- Pandas (Data Processing)
 
 ---
 
@@ -74,4 +78,4 @@ Chinese international students in Adelaide who want a more visual and efficient 
 
 ```bash
 pip install -r requirements.txt
-streamlit run app.py
+streamlit run 租房地图.py

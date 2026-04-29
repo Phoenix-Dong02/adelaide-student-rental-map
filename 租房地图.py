@@ -22,23 +22,32 @@ st.caption("以地图为核心，更直观地按位置和价格找房")
 st.page_link("pages/发布房源.py", label="管理员发布", icon="➕")
 
 df = data.get_dataframe()
-
 filtered_df = filters.apply_filters(df)
 
-col1, col2 = st.columns([0.8, 4.2])
+if "selected_listing_id" not in st.session_state:
+    st.session_state.selected_listing_id = None
 
-with col1:
-    ui.render_list(filtered_df)
+if "listing_id" in st.query_params:
+    st.session_state.selected_listing_id = int(st.query_params["listing_id"])
+
+col1, col2 = st.columns([1.1, 4.2])
 
 with col2:
-    map_view.render_map(filtered_df)
+    clicked_id = map_view.render_map(filtered_df)
 
-st.divider()
-st.subheader("意见反馈")
+if clicked_id is not None:
+    st.session_state.selected_listing_id = clicked_id
 
-feedback = st.text_area("你有什么建议？")
+with col1:
+    ui.render_selected_listing(filtered_df)
 
-if st.button("提交反馈"):
-    if feedback.strip():
-        database.insert_feedback(feedback.strip())
-        st.success("感谢你的反馈！")
+with st.sidebar:
+    st.divider()
+    st.subheader("意见反馈")
+
+    feedback = st.text_area("你有什么建议？")
+
+    if st.button("提交反馈"):
+        if feedback.strip():
+            database.insert_feedback(feedback.strip())
+            st.success("感谢你的反馈！")

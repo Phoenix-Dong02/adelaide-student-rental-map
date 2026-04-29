@@ -3,11 +3,10 @@ import folium
 from streamlit_folium import st_folium
 import base64
 import os
+import math
 
 
 def image_to_html_src(image_path: str) -> str:
-    # Convert image path (local or URL) into HTML display format
-
     if not image_path:
         return ""
 
@@ -25,10 +24,35 @@ def image_to_html_src(image_path: str) -> str:
     return f"data:image/jpeg;base64,{encoded}"
 
 
-def render_map(filtered_df):
-    # Render interactive map with listing markers
+def find_nearest_listing_id(filtered_df, lat, lng):
+    if filtered_df.empty:
+        return None
 
-    m = folium.Map(location=[-34.9285, 138.6007], zoom_start=12)
+    nearest_id = None
+    nearest_distance = float("inf")
+
+    for _, row in filtered_df.iterrows():
+        distance = math.sqrt(
+            (float(row["纬度"]) - lat) ** 2 +
+            (float(row["经度"]) - lng) ** 2
+        )
+
+        if distance < nearest_distance:
+            nearest_distance = distance
+            nearest_id = row["id"]
+
+    return nearest_id
+
+
+def render_map(filtered_df):
+    selected_id = st.session_state.get("selected_listing_id")
+
+    center_lat = -34.9285
+    center_lng = 138.6007
+    zoom = 12
+
+
+    m = folium.Map(location=[center_lat, center_lng], zoom_start=zoom)
 
     for _, row in filtered_df.iterrows():
         image_value = str(row["图片"]) if row["图片"] else ""
@@ -42,30 +66,47 @@ def render_map(filtered_df):
         )
 
         popup_html = f"""
-        <div style='width:260px'>
-            <h4>{row['标题']}</h4>
-            <p><b>区域：</b> {row['区域']}</p>
-            <p><b>价格：</b> ${row['价格']}/周</p>
-            <p><b>房型：</b> {row['房型']}</p>
-            <p><b>联系人：</b> {row['联系人']}</p>
-            <p><b>电话：</b> {row['电话']}</p>
-            <p><b>微信：</b> {row['微信']}</p>
-            <p style='color:gray;font-size:12px'>
-            位置为大致范围，具体地址请联系房东。
-            </p>
-            {image_html}
-        </div>
+            <div style='width:240px'>
+                {image_html}
+                <h4>{row['标题']}</h4>
+                <p><b>${row['价格']}/周</b></p>
+                <p style='color:gray;font-size:12px'>
+                    左侧查看完整信息
+                </p>
+            </div>
         """
 
         status = row.get("status", "active")
-
         color = "red" if status == "active" else "gray"
+
+        popup = folium.Popup(
+            popup_html,
+            max_width=300
+        )
 
         folium.Marker(
             location=[row["纬度"], row["经度"]],
-            popup=folium.Popup(popup_html, max_width=300),
+            popup=popup,
             tooltip=f"{row['标题']} - ${row['价格']}/周",
             icon=folium.Icon(color=color)
         ).add_to(m)
 
-    st_folium(m, height=900, use_container_width=True)
+    map_data = st_folium(
+        m,
+        height=900,
+        use_container_width=True,
+        key="rental_map"
+        
+    )
+    if map_data and map_data.get("last_object_clicked"):
+        clicked_lat = map_data["last_object_clicked"]["lat"]
+        clicked_lng = map_data["last_object_clicked"]["lng"]
+
+        nearest_id = find_nearest_listing_id(filtered_df, clicked_lat, clicked_lng)
+
+        if nearest_id is not None:
+            return nearest_id
+
+    return None
+
+    
