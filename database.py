@@ -101,4 +101,12 @@ def update_listing_status(listing_id, status):
         .execute()
     )
 
-    
+def update_listing(listing_id, updated_data):
+    supabase = get_supabase_client()
+    return (
+        supabase
+        .table("listings")
+        .update(updated_data)
+        .eq("id", int(listing_id))
+        .execute()
+    ) 
