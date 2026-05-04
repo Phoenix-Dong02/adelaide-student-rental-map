@@ -4,7 +4,7 @@ import folium
 from streamlit_folium import st_folium
 from image_service import upload_image_to_cloudinary
 
-st.set_page_config(page_title="后台数据", layout="wide")
+st.set_page_config(page_title="Admin", layout="wide")
 
 password = st.text_input("管理员密码", type="password")
 
@@ -12,24 +12,49 @@ if password != st.secrets.get("ADMIN_PASSWORD"):
     st.warning("请输入管理员密码")
     st.stop()
 
-st.title("后台数据")
+st.title("房源管理")
 
-st.subheader("访问记录")
-st.dataframe(database.get_table_dataframe("page_visits"))
+# ── 待审核 ──────────────────────────────────────────────────────────────────
+st.subheader("待审核房源")
+pending_df = database.get_pending_listings()
 
-st.subheader("房源点击")
-st.dataframe(database.get_table_dataframe("listing_clicks"))
+if pending_df.empty:
+    st.info("暂无待审核房源")
+else:
+    for _, row in pending_df.iterrows():
+        with st.container(border=True):
+            image_value = str(row["图片"]) if row["图片"] else ""
+            image_url = image_value.split(",")[0].strip() if image_value else ""
+            if image_url:
+                st.image(image_url, use_container_width=True)
 
-st.subheader("反馈")
-st.dataframe(database.get_table_dataframe("feedback"))
+            st.markdown(f"**{row['标题']}**")
+            st.markdown(f"价格：${row['价格']}/周　区域：{row['区域']}　房型：{row['房型']}")
+            if row.get("描述"):
+                st.markdown(f"描述：{row['描述']}")
 
-st.subheader("房源")
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("通过", key=f"approve_{row['id']}"):
+                    database.update_listing_status(row["id"], "active")
+                    st.rerun()
+            with col2:
+                if st.button("拒绝", key=f"reject_{row['id']}"):
+                    database.update_listing_status(row["id"], "rejected")
+                    st.rerun()
+
+st.divider()
+
+# ── 全部房源 ────────────────────────────────────────────────────────────────
+st.subheader("全部房源")
 df = database.get_all_listings()
 st.dataframe(df)
 
 if df.empty:
     st.info("暂无房源")
 else:
+    all_statuses = ["active", "rented", "pending", "rejected"]
+
     for _, row in df.iterrows():
         with st.expander(f"{row['标题']} - 当前状态：{row.get('status', 'active')}"):
 
@@ -97,8 +122,9 @@ else:
 
             status = st.selectbox(
                 "状态",
-                ["active", "rented"],
-                index=0 if row.get("status", "active") == "active" else 1,
+                all_statuses,
+                index=all_statuses.index(row.get("status", "active"))
+                if row.get("status", "active") in all_statuses else 0,
                 key=f"status_{row['id']}"
             )
 
@@ -112,7 +138,7 @@ else:
                         "标题": title,
                         "区域": suburb,
                         "价格": int(price),
-                        "房型": room_type,                       
+                        "房型": room_type,
                         "纬度": float(latitude),
                         "经度": float(longitude),
                         "描述": description,
@@ -134,7 +160,7 @@ else:
                         st.success("已标记为已出租")
                         st.rerun()
                 else:
-                    if st.button("重新上架", key=f"active_{row['id']}"):
+                    if st.button("重新上架", key=f"reactivate_{row['id']}"):
                         database.update_listing_status(row["id"], "active")
                         st.success("已重新上架")
                         st.rerun()

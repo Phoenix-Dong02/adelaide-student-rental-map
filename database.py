@@ -28,6 +28,19 @@ def get_active_listings():
     return pd.DataFrame(response.data)
 
 
+def get_pending_listings():
+    supabase = get_supabase_client()
+    response = (
+        supabase
+        .table("listings")
+        .select("*")
+        .eq("status", "pending")
+        .order("id", desc=True)
+        .execute()
+    )
+    return pd.DataFrame(response.data)
+
+
 def get_all_listings():
     supabase = get_supabase_client()
     response = (
