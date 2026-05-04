@@ -6,20 +6,28 @@ import map_view
 import ui
 import database
 
-st.set_page_config(page_title="阿德莱德学生租房地图", layout="wide")
+st.set_page_config(
+    page_title="阿德莱德租房地图",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
-database.create_table()
-database.migrate_database()
-database.create_tracking_tables()
+
+hide_streamlit_style = """
+    <style>
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    </style>
+"""
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 if "visit_recorded" not in st.session_state:
     database.record_page_visit()
     st.session_state.visit_recorded = True
 
-st.title("阿德莱德学生租房地图")
+st.title("阿德莱德租房地图")
 st.caption("以地图为核心，更直观地按位置和价格找房")
 
-st.page_link("pages/发布房源.py", label="管理员发布", icon="➕")
 
 df = data.get_dataframe()
 filtered_df = filters.apply_filters(df)

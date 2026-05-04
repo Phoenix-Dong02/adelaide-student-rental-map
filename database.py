@@ -10,20 +10,6 @@ def get_supabase_client():
     return create_client(url, key)
 
 
-# Keep these functions so old code will not break.
-# Tables are now created in Supabase SQL Editor, not inside Python.
-def create_table():
-    pass
-
-
-def migrate_database():
-    pass
-
-
-def create_tracking_tables():
-    pass
-
-
 def insert_listing(listing):
     supabase = get_supabase_client()
     return supabase.table("listings").insert(listing).execute()

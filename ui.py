@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 import database
 
 
@@ -14,7 +15,7 @@ def move_selected_to_top(df):
     if selected_df.empty:
         return df
 
-    return selected_df._append(other_df, ignore_index=True)
+    return pd.concat([selected_df, other_df], ignore_index=True)
 
 
 def render_list(filtered_df):

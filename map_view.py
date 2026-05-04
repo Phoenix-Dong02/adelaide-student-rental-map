@@ -1,27 +1,12 @@
-import streamlit as st
 import folium
 from streamlit_folium import st_folium
-import base64
-import os
 import math
 
 
 def image_to_html_src(image_path: str) -> str:
-    if not image_path:
-        return ""
-
-    if image_path.startswith("http://") or image_path.startswith("https://"):
+    if image_path and (image_path.startswith("http://") or image_path.startswith("https://")):
         return image_path
-
-    normalized_path = image_path.replace("\\", "/")
-
-    if not os.path.exists(normalized_path):
-        return ""
-
-    with open(normalized_path, "rb") as f:
-        encoded = base64.b64encode(f.read()).decode("utf-8")
-
-    return f"data:image/jpeg;base64,{encoded}"
+    return ""
 
 
 def find_nearest_listing_id(filtered_df, lat, lng):
@@ -45,8 +30,6 @@ def find_nearest_listing_id(filtered_df, lat, lng):
 
 
 def render_map(filtered_df):
-    selected_id = st.session_state.get("selected_listing_id")
-
     center_lat = -34.9285
     center_lng = 138.6007
     zoom = 12
