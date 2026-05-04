@@ -1,0 +1,13 @@
+[[pages]]
+path = "pages/发布房源.py"
+name = "发布房源"
+
+[[pages]]
+path = "pages/_admin.py"
+name = "admin"
+hidden = true
+
+[[pages]]
+path = "pages/_dashboard.py"
+name = "dashboard"
+hidden = true
