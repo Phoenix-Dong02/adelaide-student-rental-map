@@ -9,8 +9,6 @@ from image_service import upload_image_to_cloudinary
 # Configure page
 st.set_page_config(page_title="发布房源", layout="wide")
 
-database.create_table()
-
 # Store selected coordinates in session
 if "selected_lat" not in st.session_state:
     st.session_state.selected_lat = -34.9285
