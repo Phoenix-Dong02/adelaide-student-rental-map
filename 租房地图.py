@@ -17,6 +17,8 @@ hide_streamlit_style = """
     <style>
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
+    [data-testid="stSidebarNavLink"][href$="_admin"] {display: none;}
+    [data-testid="stSidebarNavLink"][href$="_dashboard"] {display: none;}
     </style>
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
