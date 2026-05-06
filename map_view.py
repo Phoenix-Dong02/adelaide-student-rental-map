@@ -29,7 +29,7 @@ def find_nearest_listing_id(filtered_df, lat, lng):
     return nearest_id
 
 
-def render_map(filtered_df):
+def render_map(filtered_df, t):
     center_lat = -34.9285
     center_lng = 138.6007
     zoom = 12
@@ -45,16 +45,17 @@ def render_map(filtered_df):
         image_html = (
             f"<img src='{img_src}' width='100%' style='border-radius:8px'/>"
             if img_src else
-            "<p><i>暂无图片</i></p>"
+            "<p><i>No Image</i></p>" if t.get("lang_code") == "en" else "<p><i>暂无图片</i></p>"
         )
 
+        view_msg = "View full info on the left" if t.get("lang_code") == "en" else "左侧查看完整信息"
         popup_html = f"""
             <div style='width:240px'>
                 {image_html}
                 <h4>{row['标题']}</h4>
                 <p><b>${row['价格']}/周</b></p>
                 <p style='color:gray;font-size:12px'>
-                    左侧查看完整信息
+                    {view_msg}
                 </p>
             </div>
         """
@@ -79,7 +80,7 @@ def render_map(filtered_df):
         height=900,
         use_container_width=True,
         key="rental_map"
-        
+
     )
     if map_data and map_data.get("last_object_clicked"):
         clicked_lat = map_data["last_object_clicked"]["lat"]

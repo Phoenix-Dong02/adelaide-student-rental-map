@@ -18,22 +18,22 @@ def move_selected_to_top(df):
     return pd.concat([selected_df, other_df], ignore_index=True)
 
 
-def render_list(filtered_df):
-    st.subheader(f"房源列表（{len(filtered_df)}）")
+def render_list(filtered_df, t):
+    st.subheader(f"{t['listing_title']}{len(filtered_df)}）")
 
     if filtered_df.empty:
-        st.warning("没有符合当前筛选条件的房源")
+        st.warning(t["listing_empty"])
         return
 
     sorted_df = move_selected_to_top(filtered_df)
 
     visible_count = st.selectbox(
-        "显示数量",
-        [5, 10, 20, "全部"],
+        t["listing_display_count"],
+        [5, 10, 20, t["filter_all"]],
         index=0
     )
 
-    if visible_count != "全部":
+    if visible_count != t["filter_all"]:
         display_df = sorted_df.head(int(visible_count))
     else:
         display_df = sorted_df
@@ -43,7 +43,7 @@ def render_list(filtered_df):
 
         with st.container(border=True):
             if is_selected:
-                st.success("当前选中")
+                st.success(t["listing_selected"])
 
             image_value = str(row["图片"]) if row["图片"] else ""
             image_url = image_value.split(",")[0].strip() if image_value else ""
@@ -52,37 +52,37 @@ def render_list(filtered_df):
                 st.image(image_url, use_container_width=True)
 
             st.markdown(f"### {row['标题']}")
-            st.markdown(f"**价格：** ${row['价格']}/周")
-            st.markdown(f"**房型：** {row['房型']}")
-            st.markdown(f"**区域：** {row['区域']}")
+            st.markdown(f"<b>{t['listing_price']}</b> ${row['价格']}{t['filter_per_week']}", unsafe_allow_html=True)
+            st.markdown(f"<b>{t['listing_room_type']}</b> {row['房型']}", unsafe_allow_html=True)
+            st.markdown(f"<b>{t['listing_suburb']}</b> {row['区域']}", unsafe_allow_html=True)
 
-            with st.expander("查看详细信息"):
-                st.markdown(f"**描述：** {row.get('描述', '暂无')}")
-                st.markdown(f"**联系人：** {row.get('联系人', '暂无')}")
-                st.markdown(f"**电话：** {row.get('电话', '暂无')}")
-                st.markdown(f"**微信：** {row.get('微信', '暂无')}")
+            with st.expander(t["listing_details"]):
+                st.markdown(f"<b>{t['listing_description']}</b> {row.get('描述', t['listing_no_data'])}", unsafe_allow_html=True)
+                st.markdown(f"<b>{t['listing_contact']}</b> {row.get('联系人', t['listing_no_data'])}", unsafe_allow_html=True)
+                st.markdown(f"<b>{t['listing_phone']}</b> {row.get('电话', t['listing_no_data'])}", unsafe_allow_html=True)
+                st.markdown(f"<b>{t['listing_wechat']}</b> {row.get('微信', t['listing_no_data'])}", unsafe_allow_html=True)
 
-            if st.button("查看地图位置", key=f"view_{row['id']}"):
+            if st.button(t["listing_view_map"], key=f"view_{row['id']}"):
                 st.session_state.selected_listing_id = row["id"]
                 st.rerun()
 
-            if st.button("我感兴趣", key=f"interest_{row['id']}"):
+            if st.button(t["listing_interested"], key=f"interest_{row['id']}"):
                 database.record_listing_click(row["id"])
-                st.success("已记录你的兴趣")
+                st.success(t["listing_interest_recorded"])
 
-def render_selected_listing(filtered_df):
-    st.subheader("房源详情")
+def render_selected_listing(filtered_df, t):
+    st.subheader(t["panel_title"])
 
     selected_id = st.session_state.get("selected_listing_id")
 
     if selected_id is None:
-        st.info("点击地图上的房源点，查看详细信息")
+        st.info(t["panel_no_selection"])
         return
 
     selected_df = filtered_df[filtered_df["id"] == selected_id]
 
     if selected_df.empty:
-        st.warning("当前房源不在筛选结果中")
+        st.warning(t["panel_not_in_filter"])
         return
 
     row = selected_df.iloc[0]
@@ -94,16 +94,16 @@ def render_selected_listing(filtered_df):
         st.image(image_url, use_container_width=True)
 
     st.markdown(f"### {row['标题']}")
-    st.markdown(f"**价格：** ${row['价格']}/周")
-    st.markdown(f"**区域：** {row['区域']}")
-    st.markdown(f"**房型：** {row['房型']}")
-    st.markdown(f"**是否包 bill：** {row['是否包bill']}")
-    st.markdown(f"**是否带家具：** {row['是否带家具']}")
-    st.markdown(f"**描述：** {row.get('描述', '暂无')}")
-    st.markdown(f"**联系人：** {row.get('联系人', '暂无')}")
-    st.markdown(f"**电话：** {row.get('电话', '暂无')}")
-    st.markdown(f"**微信：** {row.get('微信', '暂无')}")
+    st.markdown(f"<b>{t['listing_price']}</b> ${row['价格']}{t['filter_per_week']}", unsafe_allow_html=True)
+    st.markdown(f"<b>{t['listing_suburb']}</b> {row['区域']}", unsafe_allow_html=True)
+    st.markdown(f"<b>{t['listing_room_type']}</b> {row['房型']}", unsafe_allow_html=True)
+    st.markdown(f"<b>{t['listing_bill']}</b> {row['是否包bill']}", unsafe_allow_html=True)
+    st.markdown(f"<b>{t['listing_furniture']}</b> {row['是否带家具']}", unsafe_allow_html=True)
+    st.markdown(f"<b>{t['listing_description']}</b> {row.get('描述', t['listing_no_data'])}", unsafe_allow_html=True)
+    st.markdown(f"<b>{t['listing_contact']}</b> {row.get('联系人', t['listing_no_data'])}", unsafe_allow_html=True)
+    st.markdown(f"<b>{t['listing_phone']}</b> {row.get('电话', t['listing_no_data'])}", unsafe_allow_html=True)
+    st.markdown(f"<b>{t['listing_wechat']}</b> {row.get('微信', t['listing_no_data'])}", unsafe_allow_html=True)
 
-    if st.button("我感兴趣", key=f"interest_{row['id']}"):
+    if st.button(t["listing_interested"], key=f"interest_{row['id']}"):
         database.record_listing_click(row["id"])
-        st.success("已记录你的兴趣")
+        st.success(t["listing_interest_recorded"])

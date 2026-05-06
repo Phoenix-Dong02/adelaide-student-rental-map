@@ -1,3 +1,8 @@
+
+[[pages]]
+path = "租房地图.py"
+name = "租房地图"
+
 [[pages]]
 path = "pages/发布房源.py"
 name = "发布房源"

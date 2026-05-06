@@ -5,9 +5,15 @@ import random
 
 import database
 from image_service import upload_image_to_cloudinary
+from translations import get_translations
 
 # Configure page
 st.set_page_config(page_title="发布房源", layout="wide")
+
+if "lang" not in st.session_state:
+    st.session_state.lang = "zh"
+
+t = get_translations(st.session_state.lang)
 
 # Store selected coordinates in session
 if "selected_lat" not in st.session_state:
@@ -16,26 +22,34 @@ if "selected_lat" not in st.session_state:
 if "selected_lng" not in st.session_state:
     st.session_state.selected_lng = 138.6007
 
-st.title("发布房源")
-st.page_link("租房地图.py", label="← 返回地图")
+hide_pages_style = """
+    <style>
+    [data-testid="stSidebarNavLink"][href$="/admin"] {display: none;}
+    [data-testid="stSidebarNavLink"][href$="/dashboard"] {display: none;}
+    </style>
+"""
+st.markdown(hide_pages_style, unsafe_allow_html=True)
+
+st.title(t["publish_title"])
+st.page_link("租房地图.py", label=t["publish_back"])
 
 # Input fields
-title = st.text_input("标题")
-suburb = st.text_input("区域")
-price = st.number_input("价格（澳元/周）", min_value=0)
-room_type = st.selectbox("房型", ["单间", "合租", "Studio", "整租"])
-description = st.text_area("描述")
+title = st.text_input(t["publish_form_title"])
+suburb = st.text_input(t["publish_form_suburb"])
+price = st.number_input(t["publish_form_price"], min_value=0)
+room_type = st.selectbox(t["publish_form_room_type"], [t["publish_form_room_single"], t["publish_form_room_shared"], t["publish_form_room_studio"], t["publish_form_room_whole"]])
+description = st.text_area(t["publish_form_description"])
 
-uploaded_file = st.file_uploader("上传图片", type=["jpg", "png", "jpeg"])
+uploaded_file = st.file_uploader(t["publish_form_image"], type=["jpg", "png", "jpeg"])
 
-contact = st.text_input("联系人")
-phone = st.text_input("电话")
-wechat = st.text_input("微信")
-bill = st.selectbox("是否包 bill", ["是", "否"])
-furniture = st.selectbox("是否带家具", ["是", "否"])
+contact = st.text_input(t["publish_form_contact"])
+phone = st.text_input(t["publish_form_phone"])
+wechat = st.text_input(t["publish_form_wechat"])
+bill = st.selectbox(t["publish_form_bill"], [t["filter_yes"], t["filter_no"]])
+furniture = st.selectbox(t["publish_form_furniture"], [t["filter_yes"], t["filter_no"]])
 
 # Map selection
-st.subheader("在地图上选择位置")
+st.subheader(t["publish_form_location"])
 
 m = folium.Map(
     location=[st.session_state.selected_lat, st.session_state.selected_lng],
@@ -54,15 +68,15 @@ if map_data and map_data.get("last_clicked"):
     st.session_state.selected_lng = map_data["last_clicked"]["lng"]
     st.rerun()
 
-latitude = st.number_input("纬度", value=st.session_state.selected_lat)
-longitude = st.number_input("经度", value=st.session_state.selected_lng)
+latitude = st.number_input(t["publish_form_latitude"], value=st.session_state.selected_lat)
+longitude = st.number_input(t["publish_form_longitude"], value=st.session_state.selected_lng)
 
 # Submit
-if st.button("提交房源"):
+if st.button(t["publish_submit_btn"]):
     if not title.strip():
-        st.error("标题不能为空。")
+        st.error(t["publish_error_title"])
     elif price <= 0:
-        st.error("价格必须大于 0。")
+        st.error(t["publish_error_price"])
     else:
         try:
             image_url = upload_image_to_cloudinary(uploaded_file)
@@ -84,7 +98,7 @@ if st.button("提交房源"):
                 "status": "pending"
             })
 
-            st.success("提交成功！审核通过后将显示在地图上。")
+            st.success(t["publish_success"])
 
         except Exception as e:
-            st.error(f"图片上传或数据写入失败：{e}")
+            st.error(f"{t['publish_error_upload']}{e}")
