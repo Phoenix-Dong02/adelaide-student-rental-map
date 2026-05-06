@@ -5,6 +5,8 @@ def apply_filters(df, t):
     # Sidebar filter panel
     st.sidebar.header(t["filter_header"])
 
+    df["价格"] = pd.to_numeric(df["价格"], errors="coerce")
+
     # Handle empty dataset safely
     if df.empty:
         st.sidebar.info(t["filter_no_listings"])
@@ -17,8 +19,9 @@ def apply_filters(df, t):
     room_type_options = [t["filter_all"]] + sorted(df["房型"].dropna().unique().tolist())
     selected_room_type = st.sidebar.selectbox(t["filter_room_type"], room_type_options)
 
-    min_price = int(df["价格"].min())
-    max_price = int(df["价格"].max())
+    price_series = pd.to_numeric(df["价格"], errors="coerce").dropna()
+    min_price = int(price_series.min())
+    max_price = int(price_series.max())
 
     if min_price == max_price:
         st.sidebar.write(f"{t['filter_current_price']}${min_price}{t['filter_per_week']}")
