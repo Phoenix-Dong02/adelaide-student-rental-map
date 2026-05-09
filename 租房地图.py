@@ -27,7 +27,9 @@ st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 if "lang" not in st.session_state:
     st.session_state.lang = "zh"
 
-if "visit_recorded" not in st.session_state:
+is_owner = st.query_params.get("owner") == st.secrets.get("OWNER_TOKEN")
+
+if "visit_recorded" not in st.session_state and not is_owner:
     database.record_page_visit()
     st.session_state.visit_recorded = True
 
