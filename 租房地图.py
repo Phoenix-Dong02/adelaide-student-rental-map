@@ -20,7 +20,8 @@ hide_streamlit_style = """
     footer {visibility: hidden;}
     [data-testid="stSidebarNavLink"][href$="/admin"] {display: none;}
     [data-testid="stSidebarNavLink"][href$="/dashboard"] {display: none;}
-    [data-testid="stToolbar"] {display: none;}
+    [data-testid="stToolbar"] {visibility: hidden;}
+    [data-testid="stSidebarCollapsedControl"] {visibility: visible;}
     </style>
 """
 
