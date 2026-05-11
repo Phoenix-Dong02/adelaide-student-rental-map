@@ -20,10 +20,10 @@ hide_streamlit_style = """
     footer {visibility: hidden;}
     [data-testid="stSidebarNavLink"][href$="/admin"] {display: none;}
     [data-testid="stSidebarNavLink"][href$="/dashboard"] {display: none;}
-    
-    a[href*="github.com"] {display: none;}
+    [data-testid="stToolbar"] {display: none;}
     </style>
 """
+
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 if "lang" not in st.session_state:
