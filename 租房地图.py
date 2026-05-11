@@ -1,5 +1,5 @@
 import streamlit as st
-
+from analytics import capture_event
 import data
 import filters
 import map_view
@@ -33,6 +33,7 @@ is_owner = st.query_params.get("owner") == st.secrets.get("OWNER_TOKEN")
 
 if "visit_recorded" not in st.session_state and not is_owner:
     database.record_page_visit()
+    capture_event("page_view")
     st.session_state.visit_recorded = True
 
 t = get_translations(st.session_state.lang)
@@ -78,4 +79,5 @@ with st.sidebar:
     if st.button(t["feedback_submit_btn"]):
         if feedback.strip():
             database.insert_feedback(feedback.strip())
+            capture_event("feedback_submitted")
             st.success(t["feedback_success"])

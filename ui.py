@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import database
+from analytics import capture_event
 
 
 def move_selected_to_top(df):
@@ -106,4 +107,8 @@ def render_selected_listing(filtered_df, t):
 
     if st.button(t["listing_interested"], key=f"interest_{row['id']}"):
         database.record_listing_click(row["id"])
+        capture_event(
+            "listing_interest",
+            {"listing_id": row["id"]}
+        )
         st.success(t["listing_interest_recorded"])

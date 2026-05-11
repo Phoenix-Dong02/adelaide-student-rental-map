@@ -2,7 +2,7 @@ import streamlit as st
 import folium
 from streamlit_folium import st_folium
 import random
-
+from analytics import capture_event
 import database
 from image_service import upload_image_to_cloudinary
 from translations import get_translations
@@ -99,6 +99,7 @@ if st.button(t["publish_submit_btn"]):
             })
 
             st.success(t["publish_success"])
+            capture_event("listing_submitted")
 
         except Exception as e:
             st.error(f"{t['publish_error_upload']}{e}")
