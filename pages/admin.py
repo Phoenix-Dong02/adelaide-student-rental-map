@@ -14,7 +14,7 @@ if password != st.secrets.get("ADMIN_PASSWORD"):
 
 st.title("房源管理")
 
-# ── 待审核 ──────────────────────────────────────────────────────────────────
+
 st.subheader("待审核房源")
 pending_df = database.get_pending_listings()
 
@@ -45,7 +45,7 @@ else:
 
 st.divider()
 
-# ── 全部房源 ────────────────────────────────────────────────────────────────
+
 st.subheader("全部房源")
 df = database.get_all_listings()
 st.dataframe(df)
