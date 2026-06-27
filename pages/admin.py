@@ -3,8 +3,12 @@ import database
 import folium
 from streamlit_folium import st_folium
 from image_service import upload_image_to_cloudinary
+from translations import get_translations
+from ui import render_image_carousel
 
 st.set_page_config(page_title="Admin", layout="wide")
+
+t = get_translations(st.session_state.get("lang", "zh"))
 
 password = st.text_input("管理员密码", type="password")
 
@@ -24,9 +28,7 @@ else:
     for _, row in pending_df.iterrows():
         with st.container(border=True):
             image_value = str(row["图片"]) if row["图片"] else ""
-            image_url = image_value.split(",")[0].strip() if image_value else ""
-            if image_url:
-                st.image(image_url, use_container_width=True)
+            render_image_carousel(row["id"], image_value, t)
 
             st.markdown(f"**{row['标题']}**")
             st.markdown(f"价格：${row['价格']}/周　区域：{row['区域']}　房型：{row['房型']}")
