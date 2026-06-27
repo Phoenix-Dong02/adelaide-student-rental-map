@@ -40,7 +40,7 @@ price = st.number_input(t["publish_form_price"], min_value=0)
 room_type = st.selectbox(t["publish_form_room_type"], [t["publish_form_room_single"], t["publish_form_room_shared"], t["publish_form_room_studio"], t["publish_form_room_whole"]])
 description = st.text_area(t["publish_form_description"])
 
-uploaded_file = st.file_uploader(t["publish_form_image"], type=["jpg", "png", "jpeg"])
+uploaded_files = st.file_uploader(t["publish_form_image"], type=["jpg", "png", "jpeg"], accept_multiple_files=True)
 
 contact = st.text_input(t["publish_form_contact"])
 phone = st.text_input(t["publish_form_phone"])
@@ -79,7 +79,8 @@ if st.button(t["publish_submit_btn"]):
         st.error(t["publish_error_price"])
     else:
         try:
-            image_url = upload_image_to_cloudinary(uploaded_file)
+            image_urls = [upload_image_to_cloudinary(f) for f in uploaded_files]
+            image_url = ",".join(url for url in image_urls if url)
 
             database.insert_listing({
                 "标题": title,

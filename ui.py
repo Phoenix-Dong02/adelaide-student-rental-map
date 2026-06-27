@@ -19,6 +19,37 @@ def move_selected_to_top(df):
     return pd.concat([selected_df, other_df], ignore_index=True)
 
 
+def render_image_carousel(listing_id, image_value, t):
+    images = [url.strip() for url in image_value.split(",") if url.strip()]
+
+    if not images:
+        return
+
+    if len(images) == 1:
+        st.image(images[0], use_container_width=True)
+        return
+
+    index_key = f"img_index_{listing_id}"
+    if index_key not in st.session_state:
+        st.session_state[index_key] = 0
+
+    current_index = st.session_state[index_key]
+
+    st.image(images[current_index], use_container_width=True)
+
+    col_prev, col_count, col_next = st.columns([1, 1, 1])
+    with col_prev:
+        if st.button(t["image_prev"], key=f"prev_{listing_id}", disabled=current_index == 0):
+            st.session_state[index_key] -= 1
+            st.rerun()
+    with col_count:
+        st.markdown(f"<div style='text-align:center'>{current_index + 1} / {len(images)}</div>", unsafe_allow_html=True)
+    with col_next:
+        if st.button(t["image_next"], key=f"next_{listing_id}", disabled=current_index == len(images) - 1):
+            st.session_state[index_key] += 1
+            st.rerun()
+
+
 def render_list(filtered_df, t):
     st.subheader(f"{t['listing_title']}{len(filtered_df)}）")
 
@@ -47,10 +78,7 @@ def render_list(filtered_df, t):
                 st.success(t["listing_selected"])
 
             image_value = str(row["图片"]) if row["图片"] else ""
-            image_url = image_value.split(",")[0].strip() if image_value else ""
-
-            if image_url:
-                st.image(image_url, use_container_width=True)
+            render_image_carousel(row["id"], image_value, t)
 
             st.markdown(f"### {row['标题']}")
             st.markdown(f"<b>{t['listing_price']}</b> ${row['价格']}{t['filter_per_week']}", unsafe_allow_html=True)
@@ -89,10 +117,7 @@ def render_selected_listing(filtered_df, t):
     row = selected_df.iloc[0]
 
     image_value = str(row["图片"]) if row["图片"] else ""
-    image_url = image_value.split(",")[0].strip() if image_value else ""
-
-    if image_url:
-        st.image(image_url, use_container_width=True)
+    render_image_carousel(row["id"], image_value, t)
 
     st.markdown(f"### {row['标题']}")
     st.markdown(f"<b>{t['listing_price']}</b> ${row['价格']}{t['filter_per_week']}", unsafe_allow_html=True)

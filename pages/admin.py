@@ -96,9 +96,10 @@ else:
             old_image = row.get("图片", "")
             st.text_area("当前图片URL", value=old_image, key=f"old_img_{row['id']}")
 
-            uploaded_file = st.file_uploader(
+            uploaded_files = st.file_uploader(
                 "上传新图片（不上传则保留原图片）",
                 type=["jpg", "png", "jpeg"],
+                accept_multiple_files=True,
                 key=f"upload_{row['id']}"
             )
 
@@ -132,7 +133,11 @@ else:
 
             with col1:
                 if st.button("保存修改", key=f"save_{row['id']}"):
-                    new_image_url = upload_image_to_cloudinary(uploaded_file) if uploaded_file else old_image
+                    if uploaded_files:
+                        new_image_urls = [upload_image_to_cloudinary(f) for f in uploaded_files]
+                        new_image_url = ",".join(url for url in new_image_urls if url)
+                    else:
+                        new_image_url = old_image
 
                     database.update_listing(row["id"], {
                         "标题": title,
