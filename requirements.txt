@@ -5,3 +5,4 @@ streamlit-folium
 cloudinary
 supabase
 posthog
+geopy
