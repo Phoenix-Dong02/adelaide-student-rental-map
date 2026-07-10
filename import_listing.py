@@ -97,11 +97,7 @@ def build_listing(data):
     }
 
 
-def main():
-    if len(sys.argv) != 2:
-        sys.exit("用法: python import_listing.py extracted/<tid>.json")
-
-    json_path = sys.argv[1]
+def run_import(json_path):
     with open(json_path, "r", encoding="utf-8") as f:
         data = json.load(f)
 
@@ -132,6 +128,15 @@ def main():
     print(f"  纬度/经度: {listing['纬度']}, {listing['经度']}")
     print(f"  联系人/电话/微信: {listing['联系人']} / {listing['电话']} / {listing['微信']}")
     print(f"  status: {listing['status']}")
+
+    return listing
+
+
+def main():
+    if len(sys.argv) != 2:
+        sys.exit("用法: python import_listing.py extracted/<tid>.json")
+
+    run_import(sys.argv[1])
 
 
 if __name__ == "__main__":
