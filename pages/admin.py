@@ -1,3 +1,5 @@
+import re
+
 import streamlit as st
 import database
 import folium
@@ -7,6 +9,8 @@ from translations import get_translations
 from ui import render_image_carousel
 
 st.set_page_config(page_title="Admin", layout="wide")
+
+SCRAPE_NOTE_RE = re.compile(r"\n*\[抓取备注:.*?\]\s*\Z", re.DOTALL)
 
 t = get_translations(st.session_state.get("lang", "zh"))
 
@@ -38,7 +42,10 @@ else:
             col1, col2 = st.columns(2)
             with col1:
                 if st.button("通过", key=f"approve_{row['id']}"):
-                    database.update_listing_status(row["id"], "active")
+                    cleaned_description = SCRAPE_NOTE_RE.sub("", row.get("描述") or "")
+                    database.update_listing(
+                        row["id"], {"status": "active", "描述": cleaned_description}
+                    )
                     st.rerun()
             with col2:
                 if st.button("拒绝", key=f"reject_{row['id']}"):
