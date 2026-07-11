@@ -46,10 +46,12 @@ else:
                     database.update_listing(
                         row["id"], {"status": "active", "描述": cleaned_description}
                     )
+                    st.cache_data.clear()
                     st.rerun()
             with col2:
                 if st.button("拒绝", key=f"reject_{row['id']}"):
                     database.update_listing_status(row["id"], "rejected")
+                    st.cache_data.clear()
                     st.rerun()
 
 st.divider()
@@ -81,21 +83,24 @@ else:
             latitude = float(row.get("纬度", -34.9285))
             longitude = float(row.get("经度", 138.6007))
 
-            st.markdown("**当前位置**")
-            m = folium.Map(location=[latitude, longitude], zoom_start=14)
-            m.add_child(folium.LatLngPopup())
-            folium.Marker([latitude, longitude]).add_to(m)
+            edit_location = st.checkbox("编辑位置", value=False, key=f"edit_location_{row['id']}")
 
-            map_data = st_folium(
-                m,
-                height=350,
-                use_container_width=True,
-                key=f"edit_map_{row['id']}"
-            )
+            if edit_location:
+                st.markdown("**当前位置**（点击地图设置新位置）")
+                m = folium.Map(location=[latitude, longitude], zoom_start=14)
+                m.add_child(folium.LatLngPopup())
+                folium.Marker([latitude, longitude]).add_to(m)
 
-            if map_data and map_data.get("last_clicked"):
-                latitude = map_data["last_clicked"]["lat"]
-                longitude = map_data["last_clicked"]["lng"]
+                map_data = st_folium(
+                    m,
+                    height=350,
+                    use_container_width=True,
+                    key=f"edit_map_{row['id']}"
+                )
+
+                if map_data and map_data.get("last_clicked"):
+                    latitude = map_data["last_clicked"]["lat"]
+                    longitude = map_data["last_clicked"]["lng"]
 
             st.write(f"当前纬度：{latitude}")
             st.write(f"当前经度：{longitude}")
@@ -164,6 +169,7 @@ else:
                         "是否带家具": furniture,
                         "status": status
                     })
+                    st.cache_data.clear()
                     st.success("修改成功")
                     st.rerun()
 
@@ -171,10 +177,12 @@ else:
                 if status == "active":
                     if st.button("标记已出租", key=f"rent_{row['id']}"):
                         database.update_listing_status(row["id"], "rented")
+                        st.cache_data.clear()
                         st.success("已标记为已出租")
                         st.rerun()
                 else:
                     if st.button("重新上架", key=f"reactivate_{row['id']}"):
                         database.update_listing_status(row["id"], "active")
+                        st.cache_data.clear()
                         st.success("已重新上架")
                         st.rerun()

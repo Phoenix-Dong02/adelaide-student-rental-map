@@ -28,6 +28,7 @@ def get_active_listings():
     return pd.DataFrame(response.data)
 
 
+@st.cache_data(ttl=60)
 def get_pending_listings():
     supabase = get_supabase_client()
     response = (
@@ -41,6 +42,7 @@ def get_pending_listings():
     return pd.DataFrame(response.data)
 
 
+@st.cache_data(ttl=60)
 def get_all_listings():
     supabase = get_supabase_client()
     response = (
