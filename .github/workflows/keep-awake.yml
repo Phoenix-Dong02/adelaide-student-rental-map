@@ -2,12 +2,22 @@ name: Keep Streamlit App Awake
 
 on:
   schedule:
-    - cron: '0 */6 * * *'   # the workflow will run every 6 hours
-  workflow_dispatch:         
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
 
 jobs:
-  ping:
+  keep-awake:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping the app
-        run: curl -s -o /dev/null -w "HTTP %{http_code}\n" https://rentmapau.com
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Playwright
+        run: |
+          pip install playwright
+          playwright install --with-deps chromium
+
+      - name: Visit app (and wake it if asleep)
+        run: python keep_awake.py
