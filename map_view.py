@@ -53,7 +53,7 @@ def render_map(filtered_df, t):
             <div style='width:240px'>
                 {image_html}
                 <h4>{row['标题']}</h4>
-                <p><b>${row['价格']}/周</b></p>
+                <p><b>${row['价格']}{t['filter_per_week']}</b></p>
                 <p style='color:gray;font-size:12px'>
                     {view_msg}
                 </p>
@@ -71,7 +71,7 @@ def render_map(filtered_df, t):
         folium.Marker(
             location=[row["纬度"], row["经度"]],
             popup=popup,
-            tooltip=f"{row['标题']} - ${row['价格']}/周",
+            tooltip=f"{row['标题']} - ${row['价格']}{t['filter_per_week']}",
             icon=folium.Icon(color=color)
         ).add_to(m)
 

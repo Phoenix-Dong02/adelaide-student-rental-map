@@ -6,3 +6,4 @@ cloudinary
 supabase
 posthog
 geopy
+deep-translator==1.11.4

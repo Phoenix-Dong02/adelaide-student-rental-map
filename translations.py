@@ -178,3 +178,21 @@ translations = {
 def get_translations(lang="zh"):
     """Get translation dictionary for specified language"""
     return translations.get(lang, translations["zh"])
+
+
+# 数据库里存的枚举值（中文规范值）→ 各语言的显示文字
+VALUE_LABELS = {
+    "en": {
+        "单间": "Single Room",
+        "合租": "Room in Shared House",
+        "Studio": "Studio",
+        "整租": "Whole House",
+        "是": "Yes",
+        "否": "No",
+    },
+}
+
+
+def translate_value(value, lang):
+    """把数据库里的中文规范值翻译成显示文字；zh 或查不到时原样返回"""
+    return VALUE_LABELS.get(lang, {}).get(value, value)

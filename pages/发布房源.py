@@ -5,7 +5,7 @@ import random
 from analytics import capture_event
 import database
 from image_service import upload_image_to_cloudinary
-from translations import get_translations
+from translations import get_translations, translate_value
 
 # Configure page
 st.set_page_config(page_title="发布房源", layout="wide")
@@ -37,7 +37,11 @@ st.page_link("租房地图.py", label=t["publish_back"])
 title = st.text_input(t["publish_form_title"])
 suburb = st.text_input(t["publish_form_suburb"])
 price = st.number_input(t["publish_form_price"], min_value=0)
-room_type = st.selectbox(t["publish_form_room_type"], [t["publish_form_room_single"], t["publish_form_room_shared"], t["publish_form_room_studio"], t["publish_form_room_whole"]])
+# 选项值是中文规范值（写进数据库的就是它），format_func 只决定屏幕上显示什么
+def format_value(value):
+    return translate_value(value, st.session_state.lang)
+
+room_type = st.selectbox(t["publish_form_room_type"], ["单间", "合租", "Studio", "整租"], format_func=format_value)
 description = st.text_area(t["publish_form_description"])
 
 uploaded_files = st.file_uploader(t["publish_form_image"], type=["jpg", "png", "jpeg"], accept_multiple_files=True)
@@ -45,8 +49,8 @@ uploaded_files = st.file_uploader(t["publish_form_image"], type=["jpg", "png", "
 contact = st.text_input(t["publish_form_contact"])
 phone = st.text_input(t["publish_form_phone"])
 wechat = st.text_input(t["publish_form_wechat"])
-bill = st.selectbox(t["publish_form_bill"], [t["filter_yes"], t["filter_no"]])
-furniture = st.selectbox(t["publish_form_furniture"], [t["filter_yes"], t["filter_no"]])
+bill = st.selectbox(t["publish_form_bill"], ["是", "否"], format_func=format_value)
+furniture = st.selectbox(t["publish_form_furniture"], ["是", "否"], format_func=format_value)
 
 # Map selection
 st.subheader(t["publish_form_location"])

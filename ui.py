@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 import database
 from analytics import capture_event
+from translations import translate_value
+from translate_service import translate_text
 
 
 def move_selected_to_top(df):
@@ -82,7 +84,7 @@ def render_list(filtered_df, t):
 
             st.markdown(f"### {row['标题']}")
             st.markdown(f"<b>{t['listing_price']}</b> ${row['价格']}{t['filter_per_week']}", unsafe_allow_html=True)
-            st.markdown(f"<b>{t['listing_room_type']}</b> {row['房型']}", unsafe_allow_html=True)
+            st.markdown(f"<b>{t['listing_room_type']}</b> {translate_value(row['房型'], st.session_state.get('lang', 'zh'))}", unsafe_allow_html=True)
             st.markdown(f"<b>{t['listing_suburb']}</b> {row['区域']}", unsafe_allow_html=True)
 
             with st.expander(t["listing_details"]):
@@ -119,13 +121,16 @@ def render_selected_listing(filtered_df, t):
     image_value = str(row["图片"]) if row["图片"] else ""
     render_image_carousel(row["id"], image_value, t)
 
-    st.markdown(f"### {row['标题']}")
+    lang = st.session_state.get("lang", "zh")
+
+    # 标题、描述是自由文本 → 机器翻译；区域、联系人、电话、微信保持原样
+    st.markdown(f"### {translate_text(row['标题'], lang)}")
     st.markdown(f"<b>{t['listing_price']}</b> ${row['价格']}{t['filter_per_week']}", unsafe_allow_html=True)
     st.markdown(f"<b>{t['listing_suburb']}</b> {row['区域']}", unsafe_allow_html=True)
-    st.markdown(f"<b>{t['listing_room_type']}</b> {row['房型']}", unsafe_allow_html=True)
-    st.markdown(f"<b>{t['listing_bill']}</b> {row['是否包bill']}", unsafe_allow_html=True)
-    st.markdown(f"<b>{t['listing_furniture']}</b> {row['是否带家具']}", unsafe_allow_html=True)
-    st.markdown(f"<b>{t['listing_description']}</b> {row.get('描述', t['listing_no_data'])}", unsafe_allow_html=True)
+    st.markdown(f"<b>{t['listing_room_type']}</b> {translate_value(row['房型'], lang)}", unsafe_allow_html=True)
+    st.markdown(f"<b>{t['listing_bill']}</b> {translate_value(row['是否包bill'], lang)}", unsafe_allow_html=True)
+    st.markdown(f"<b>{t['listing_furniture']}</b> {translate_value(row['是否带家具'], lang)}", unsafe_allow_html=True)
+    st.markdown(f"<b>{t['listing_description']}</b> {translate_text(row.get('描述', t['listing_no_data']), lang)}", unsafe_allow_html=True)
     st.markdown(f"<b>{t['listing_contact']}</b> {row.get('联系人', t['listing_no_data'])}", unsafe_allow_html=True)
     st.markdown(f"<b>{t['listing_phone']}</b> {row.get('电话', t['listing_no_data'])}", unsafe_allow_html=True)
     st.markdown(f"<b>{t['listing_wechat']}</b> {row.get('微信', t['listing_no_data'])}", unsafe_allow_html=True)
