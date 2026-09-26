@@ -6,4 +6,4 @@ cloudinary
 supabase
 posthog
 geopy
-deep-translator==1.11.4
+anthropic==0.116.0
