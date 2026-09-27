@@ -18,8 +18,6 @@ hide_streamlit_style = """
     <style>
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
-    [data-testid="stSidebarNavLink"][href$="/admin"] {display: none;}
-    [data-testid="stSidebarNavLink"][href$="/dashboard"] {display: none;}
     </style>
 """
 
@@ -50,6 +48,11 @@ st.caption(t["main_subtitle"])
 
 
 df = data.get_dataframe()
+
+with st.sidebar:
+    st.page_link("租房地图.py", label=t["nav_map"])
+    st.page_link("pages/发布房源.py", label=t["nav_publish"])
+
 filtered_df = filters.apply_filters(df, t)
 
 if "selected_listing_id" not in st.session_state:

@@ -22,13 +22,9 @@ if "selected_lat" not in st.session_state:
 if "selected_lng" not in st.session_state:
     st.session_state.selected_lng = 138.6007
 
-hide_pages_style = """
-    <style>
-    [data-testid="stSidebarNavLink"][href$="/admin"] {display: none;}
-    [data-testid="stSidebarNavLink"][href$="/dashboard"] {display: none;}
-    </style>
-"""
-st.markdown(hide_pages_style, unsafe_allow_html=True)
+with st.sidebar:
+    st.page_link("租房地图.py", label=t["nav_map"])
+    st.page_link("pages/发布房源.py", label=t["nav_publish"])
 
 st.title(t["publish_title"])
 st.page_link("租房地图.py", label=t["publish_back"])

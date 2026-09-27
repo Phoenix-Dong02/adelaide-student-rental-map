@@ -51,6 +51,10 @@ translations = {
         "map_no_image": "暂无图片",
         "map_view_info": "左侧查看完整信息",
 
+        # Navigation
+        "nav_map": "租房地图",
+        "nav_publish": "发布房源",
+
         # Publish listing
         "publish_title": "发布房源",
         "publish_back": "← 返回地图",
@@ -138,6 +142,10 @@ translations = {
         "map_no_image": "No Image",
         "map_view_info": "View full info on the left",
 
+        # Navigation
+        "nav_map": "Rental Map",
+        "nav_publish": "Post a Listing",
+
         # Publish listing
         "publish_title": "Post a Listing",
         "publish_back": "← Back to Map",
@@ -180,7 +188,6 @@ def get_translations(lang="zh"):
     return translations.get(lang, translations["zh"])
 
 
-# 数据库里存的枚举值（中文规范值）→ 各语言的显示文字
 VALUE_LABELS = {
     "en": {
         "单间": "Single Room",
