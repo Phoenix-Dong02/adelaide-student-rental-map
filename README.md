@@ -1,3 +1,13 @@
+## 🏁 CS Club x FUCS Hackathon 2026
+
+This project existed before the hackathon: the map interface, filters, posting page,
+admin review, and the scraping + AI extraction pipeline.
+
+Built during the hackathon (Sep 26–27, 2026): English translation.
+- Titles and descriptions translated with the Claude API, cached, with fallback to the original text
+- Room type and yes/no values translated with a lookup table
+- Map markers, popups and sidebar navigation follow the selected language
+
 # Adelaide Student Rental Map
 
 A Streamlit-based rental map platform designed for Chinese students in Adelaide.
